@@ -89,4 +89,34 @@ For more information please see:
 
 WARNING
     end
+
+    def run_db_schema_cache_dump
+      instrument "rails5.run_db_schema_cache_dump" do
+        log("db_schema_cache_dump") do
+          db_schema_cache_dump = rake.task("db:schema:cache:dump")
+          return true unless db_schema_cache_dump.is_defined?
+
+          topic("Dumping schema cache")
+
+          db_schema_cache_dump.invoke(env: rake_env)
+
+          if db_schema_cache_dump.success?
+            log "db_schema_cache_dump", :status => "success"
+            puts "Schema cache dump completed (#{"%.2f" % db_schema_cache_dump.time}s)"
+          else
+            mcount "fail.db_schema_cache_dump"
+            log "db_schema_cache_dump", :status => "failure"
+            msg = "Dumping schema cache failed.\n"
+
+            if db_schema_cache_dump.output.match(/(127\.0\.0\.1)|(org\.postgresql\.util)/)
+              msg << "Attempted to access a nonexistent database:\n"
+              msg << "https://devcenter.heroku.com/articles/pre-provision-database\n"
+            end
+
+
+            error msg
+          end
+        end
+      end
+    end
 end

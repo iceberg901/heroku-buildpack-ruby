@@ -105,6 +105,7 @@ WARNING
         create_database_yml
         install_binaries
         run_assets_precompile_rake_task
+        run_db_schema_cache_dump
       end
       config_detect
       best_practice_warnings
@@ -1092,5 +1093,9 @@ params = CGI.parse(uri.query || "")
       # need to reinstall language pack gems
       install_bundler_in_app
     end
+  end
+
+  def run_db_schema_cache_dump
+
   end
 end
